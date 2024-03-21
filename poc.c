@@ -1,12 +1,5 @@
-struct gopt {
-  int argc;
-  char ** argv;
-  const char * format;
-};
-
-int gopt_parse(struct gopt * opts, const char ** argvalue) {
-  return -1;
-}
+#define GOPT_IMPLEMENTATION
+#include "gopt.h"
 
 #include <stdio.h>
 
