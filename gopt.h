@@ -65,15 +65,35 @@ int gopt_parse(struct gopt *opts, char **argvalue) {
   if (a[0] != '-')
     return -1;
 
-  if (a[1] == 0)
+  char op = a[1];
+  if (op == 0 || a[2] != 0)
     return -1;
-  if (a[1] == '-' && a[2] == 0) {
+  if (op == '-') {
     opts->argc--;
     opts->argv++;
     return 0;
   }
 
-  return -1;
+  const char *f = opts->format;
+  while (*f != 0 && *f != op) {
+    f++;
+  }
+  if (*f != op)
+    return -1;
+
+  if (f[1] == ':') {
+    if (opts->argc == 0)
+      return -1;
+
+    *argvalue = *(opts->argv + 1);
+    opts->argc -= 2;
+    opts->argv += 2;
+    return op;
+  }
+
+  opts->argc--;
+  opts->argv++;
+  return op;
 }
 #endif // GOPT_IMPLEMENTATION
 
