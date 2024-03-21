@@ -10,11 +10,9 @@ int usage(const char * argv0) {
 
 int main(int argc, char ** argv) {
   struct gopt opts;
-  opts.argc = argc;
-  opts.argv = argv;
-  opts.format = "bf:";
+  GOPT(opts, argc, argv, "bf:");
 
-  const char *value;
+  char *value;
 
   int bflag = 0;
   const char *fflag = "";
@@ -36,6 +34,8 @@ int main(int argc, char ** argv) {
   if (opts.argc != 1)
     return usage(argv[0]);
 
-  printf("bflag = %d\nfflag = [%s]\nname = [%s]\n", bflag, fflag, opts.argv[0]);
+  const char *name = opts.argv[0];
+
+  printf("bflag = %d\nfflag = [%s]\nname = [%s]\n", bflag, fflag, name);
   return 0;
 }

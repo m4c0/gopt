@@ -13,19 +13,68 @@
 extern "C" {
 #endif
 
+/// Input structure for the option parser.
+///
+/// Suggested initialisation:
+///
+/// struct gopt opts;
+/// GOPT(opts, argc, argv, "format");
 struct gopt {
+  /// Number of arguments left in argv
   int argc;
+  /// Argument list
   char **argv;
+  /// Format describing arguments. Uses a syntax similar to getopt:
+  /// one letter for the argument, optionally followed by a colon if it requires
+  /// a value.
+  /// Example: "bf:" supports a command-line like "-b -f <value>"
   const char *format;
 };
-int gopt_parse(struct gopt *opts, const char **argvalue);
+#define GOPT(opts, c, v, f)                                                    \
+  {                                                                            \
+    opts.argc = (c)-1;                                                         \
+    opts.argv = (v) + 1;                                                       \
+    opts.format = f;                                                           \
+  }
+
+/// Parses the next available argument.
+///
+/// See gopt structure documentation for example on how to initialise "opts".
+///
+/// "argvalue" is a pointer which will contain the argument value (if required
+/// by its format).
+///
+/// Returns:
+/// 0 - if we reach the last argument or "--"
+/// -1 - if we reach an invalid argument
+/// a character if we reach a valid argument. Its value will be in "argvalue"
+int gopt_parse(struct gopt *opts, char **argvalue);
 
 #ifdef __cplusplus
 }
 #endif
 
 #ifdef GOPT_IMPLEMENTATION
-int gopt_parse(struct gopt *opts, const char **argvalue) { return -1; }
+int gopt_parse(struct gopt *opts, char **argvalue) {
+  if (opts->argc == 0)
+    return 0;
+
+  char *a = opts->argv[0];
+  if (a[0] == 0)
+    return -1;
+  if (a[0] != '-')
+    return -1;
+
+  if (a[1] == 0)
+    return -1;
+  if (a[1] == '-' && a[2] == 0) {
+    opts->argc--;
+    opts->argv++;
+    return 0;
+  }
+
+  return -1;
+}
 #endif // GOPT_IMPLEMENTATION
 
 // MIT License
